@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Alliance Message Checker</title>
+</head>
+<body bgcolor="#255e91">
+<spin style="color:White; font-family:'Verdana'">Alliance Message Checker 0.4</spin>
+<textarea oninput="store();" cols="40" rows="45" id="originalMessage" style="box-sizing:border-box;padding:1em;width:100%;height:360px;font-size:16px"></textarea>
+<br>
+<label style="color:white;font-family:'Verdana'">Color:<input type="color" id="color" value="#8080ff" onInput="pickColor();"></label>
+<button onClick="setColor();" style="font-size:16px" id="colorButton">Set</button>
+<spin onClick="addRed();">🔴</spin>
+<spin onClick="addWhite();">🔵</spin>
+<spin onClick="addGreen();">🟢</spin>
+<spin onClick="addYellow();">🟡</spin>
+<spin onClick="addPurple();">🟣</spin>
+<br>
+<button onClick="convert();" style="font-size:16px">Convert</button>
+<button onClick="copy();" style="font-size:16px">Copy to clipboard</button>
+<button onClick="restore();" style="font-size:16px">Restore</button>
+<button onClick="restoreInvitation();" style="font-size:16px">勧誘読込</button>
+<button onClick="restoreAlliance();" style="font-size:16px">幕読込</button><br>
+<br>
+<p id="convertedMessage"></p>
+<button onClick="storeInvitation();" style="font-size:16px">勧誘保存</button>
+<button onClick="storeAlliance();" style="font-size:16px">幕保存</button>
+<script>
+function pickColor() {
+    document.getElementById('colorButton').style.backgroundColor = document.getElementById('color').value
+}
+function setColor() {
+    var src = document.getElementById('originalMessage');
+    src.value = src.value.substr(0, src.selectionStart) 
+            + "["
+            + document.getElementById('color').value
+            + "]"
+            + src.value.substr(src.selectionStart);
+}
+function addRed() {
+    var src = document.getElementById('originalMessage');
+    src.value = src.value.substr(0, src.selectionStart) 
+            + ":elementfire:"
+            + src.value.substr(src.selectionStart);
+}
+function addWhite() {
+    var src = document.getElementById('originalMessage');
+    src.value = src.value.substr(0, src.selectionStart) 
+            + ":elementice:"
+            + src.value.substr(src.selectionStart);
+}
+function addGreen() {
+    var src = document.getElementById('originalMessage');
+    src.value = src.value.substr(0, src.selectionStart) 
+            + ":elementnature:"
+            + src.value.substr(src.selectionStart);
+}
+function addYellow() {
+    var src = document.getElementById('originalMessage');
+    src.value = src.value.substr(0, src.selectionStart) 
+            + ":elementholy:"
+            + src.value.substr(src.selectionStart);
+}
+function addPurple() {
+    var src = document.getElementById('originalMessage');
+    src.value = src.value.substr(0, src.selectionStart) 
+            + ":elementdark:"
+            + src.value.substr(src.selectionStart);
+}
+function convert(){
+    var src = document.getElementById('originalMessage').value;
+    var dst = "";
+    var dst2 = "";
+    var pos = 0;
+    var stored = false;
+    var storedpos = 0;
+    var lastpos = 0;
+    dst += "<spin style=\"color:white; text-shadow: 1px 1px 3px #000000; font-family:'Verdana'; font-size:14px\">";
+    for (var i = 0; i < src.length; i++) {
+        var c = src.charAt(i);
+        if (c == '[') {
+            // [#RRGGBB]
+            if (src.charAt(i + 1) == '#' && src.charAt(i + 8) == ']') {
+                dst += "</spin>";
+                dst += "<spin style=\"color:#";
+                dst += src.substring(i + 2, i + 8);
+                dst += "; text-shadow: 1px 1px 3px #000000; font-family:'Verdana'; font-size:14px\">";
+                i += 8;
+            }
+            else if (src.substring(i + 1, i + 4) == '#!]') {
+                dst += "</spin>";
+                dst += "<spin style=\"color:red; text-shadow: 1px 1px 3px #000000; font-family:'Verdana'; font-size:14px\">";
+                i += 3;
+            }
+            else {
+                dst += c;
+                pos++;
+            }
+        }
+        else if (c == ':') {
+            if (src.substring(i + 1, i + 7) == 'smile:') {
+                dst += "🙂";
+                pos++;
+                i += 6;
+            }
+            else if (src.substring(i + 1, i + 7) == 'heart:') {
+                dst += "❤️";
+                pos++;
+                i += 6;
+            }
+            else if (src.substring(i + 1, i + 7) == 'sword:') {
+                dst += "🗡";
+                pos++;
+                i += 6;
+            }
+            else if (src.substring(i + 1, i + 8) == 'swords:') {
+                dst += "⚔️";
+                pos++;
+                i += 7;
+            }
+            else if (src.substring(i + 1, i + 13) == 'elementfire:') {
+//                dst += "🔥";
+                dst += "🔴";
+                pos++;
+                i += 12;
+            }
+            else if (src.substring(i + 1, i + 12) == 'elementice:') {
+                // dst += "❄️";
+                dst += "🔵";
+                pos++;
+                i += 11;
+            }
+            else if (src.substring(i + 1, i + 15) == 'elementnature:') {
+                // dst += "🌳";
+                dst += "🟢";
+                pos++;
+                i += 14;
+            }
+            else if (src.substring(i + 1, i + 13) == 'elementholy:') {
+                dst += "🟡";
+                pos++;
+                i += 12;
+            }
+            else if (src.substring(i + 1, i + 13) == 'elementdark:') {
+                dst += "🟣";
+                pos++;
+                i += 12;
+            }
+            else {
+                dst += c;
+                pos++;
+            }
+        }
+        else if (c == ' ') {
+            storedpos += pos + 1;
+            stored = true;
+            lastpos = i;
+            dst2 += dst;
+            dst2 += " ";
+            dst = "";
+            pos = 0;
+        }
+        else {
+            dst += c;
+            pos++;
+        }
+        if (storedpos + pos > 23) {
+            if (stored) {
+                dst2 += "<br>";
+                i = lastpos;
+            }
+            else {
+                dst2 += dst;
+                dst2 += "<br>";
+            }
+            dst = "";
+            pos = 0;
+            stored = false;
+            storedpos = 0;
+        } 
+    }
+    dst2 += dst;
+    dst2 += "</spin>";
+
+    var out = document.getElementById('convertedMessage');
+    out.innerHTML = dst2;
+}
+function copy(){
+    var textarea = document.getElementById('originalMessage');
+    textarea.select();
+    document.execCommand("copy");
+}
+function store(){
+    convert();
+    var src = document.getElementById('originalMessage').value;
+    if (src.length > 1) {
+        var cookie = "message=" + escape(src) + ";max-age=6048000";
+        document.cookie = encodeURI(cookie);
+    }
+}
+function restore() {
+    var src = document.getElementById('originalMessage');
+    var allCookies = document.cookie;
+    var value = document.cookie.split('; ').find(row => row.startsWith('message')).split('=')[1];
+    src.value = unescape(decodeURI(value));
+    convert();
+}
+function storeInvitation(){
+    convert();
+    if (window.confirm('勧誘を保存します')) {
+        var src = document.getElementById('originalMessage').value;
+        if (src.length > 1) {
+            var cookie = "invitation=" + escape(src) + ";max-age=6048000";
+            document.cookie = encodeURI(cookie);
+        }
+        window.alert('勧誘を保存しました')
+    }
+}
+function restoreInvitation() {
+    var src = document.getElementById('originalMessage');
+    var allCookies = document.cookie;
+    var value = document.cookie.split('; ').find(row => row.startsWith('invitation')).split('=')[1];
+    src.value = unescape(decodeURI(value));
+    convert();
+}
+function storeAlliance(){
+    convert();
+    if (window.confirm('幕を保存します')) {
+        var src = document.getElementById('originalMessage').value;
+        if (src.length > 1) {
+            var cookie = "alliance=" + escape(src) + ";max-age=6048000";
+            document.cookie = encodeURI(cookie);
+        }
+        window.alert('幕を保存しました')
+    }
+}
+function restoreAlliance() {
+    var src = document.getElementById('originalMessage');
+    var allCookies = document.cookie;
+    var value = document.cookie.split('; ').find(row => row.startsWith('alliance')).split('=')[1];
+    src.value = unescape(decodeURI(value));
+    convert();
+}
+</script>
+</body>
+</html>
